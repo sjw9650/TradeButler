@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc build-essential libxml2-dev libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/pyproject.toml /app/
+RUN pip install --no-cache-dir fastapi uvicorn pydantic-settings sqlalchemy psycopg2-binary feedparser httpx beautifulsoup4 readability-lxml celery redis click openai
+
+COPY backend /app/backend
+ENV PYTHONPATH=/app
+
+CMD ["celery", "-A", "backend.app.workers.celery_app.celery", "worker", "-Q", "default", "--loglevel=INFO"]
