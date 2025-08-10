@@ -1,7 +1,9 @@
 from .celery_app import celery
 from ..repo.db import SessionLocal
 from ..models.content import Content, AICache
+from ..models.cost_log import CostLog
 from ..core.config import settings
+from ..utils.cost_calculator import calculate_openai_cost
 import json
 from openai import OpenAI
 from typing import List, Dict, Any
@@ -147,6 +149,11 @@ JSON 형식을 정확히 준수하고, 다른 텍스트는 포함하지 마세�
             response_format={"type": "json_object"}  # JSON 응답 강제
         )
         
+        # 토큰 사용량 및 비용 계산
+        tokens_in = response.usage.prompt_tokens
+        tokens_out = response.usage.completion_tokens
+        cost_usd, cost_breakdown = calculate_openai_cost(MODEL_VERSION, tokens_in, tokens_out)
+        
         # 응답 파싱
         result = json.loads(response.choices[0].message.content)
         
@@ -159,7 +166,13 @@ JSON 형식을 정확히 준수하고, 다른 텍스트는 포함하지 마세�
             "status": "success",
             "summary_bullets": summary_bullets,
             "tags": tags,
-            "insight": insight
+            "insight": insight,
+            "cost_info": {
+                "tokens_in": tokens_in,
+                "tokens_out": tokens_out,
+                "cost_usd": cost_usd,
+                "cost_breakdown": cost_breakdown
+            }
         }
         
     except json.JSONDecodeError:
