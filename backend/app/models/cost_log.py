@@ -17,7 +17,7 @@ class CostLog(Base):
     request_type = Column(String(50), nullable=False)  # 요청 유형 (summarize, tag 등)
     status = Column(String(20), nullable=False, default="success")  # 성공/실패 상태
     error_message = Column(Text, nullable=True)  # 오류 메시지
-    metadata = Column(JSONB, nullable=True)  # 추가 메타데이터
+    extra_data = Column(JSONB, nullable=True)  # 추가 메타데이터
     created_at = Column(DateTime, default=datetime.utcnow)
     
     __table_args__ = (
