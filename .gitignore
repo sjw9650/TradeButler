@@ -82,4 +82,10 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-.hypothesis/ 
+.hypothesis/
+
+# Documentation (keep these files)
+!PROJECT_OVERVIEW.md
+!TODO.md
+!DEVELOPMENT_GUIDE.md
+!README.md 
