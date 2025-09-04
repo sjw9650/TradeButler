@@ -20,6 +20,16 @@ services:
     depends_on:
       - db
       - redis
+  beat:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker
+    env_file:
+      - ../backend/.env
+    command: celery -A backend.app.workers.celery_app beat --loglevel=info
+    depends_on:
+      - db
+      - redis
   db:
     image: postgres:15
     environment:

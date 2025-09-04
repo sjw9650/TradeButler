@@ -12,7 +12,7 @@ dependencies = [
     "httpx",
     "beautifulsoup4",
     "readability-lxml",
-    "celery",
+    "celery[beat]",
     "redis",
     "click",
     "openai",
