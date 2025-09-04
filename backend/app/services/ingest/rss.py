@@ -257,17 +257,21 @@ def ingest_rss(feed_url: str, source_name: str = "rss", db: Session | None = Non
     >>> result = ingest_rss("https://example.com/feed.xml", "example_source")
     >>> print(f"Saved {result['saved']} new contents")
     """
-    db = db or SessionLocal()
-    
-    # RSS 피드 파싱
-    feed = feedparser.parse(feed_url)
-    
-    processed = 0
-    saved = 0
-    duplicates = 0
-    queued_tasks = 0
-    
     try:
+        print(f"ingest_rss 시작 - feed_url: {feed_url}, source_name: {source_name}")
+        
+        db = db or SessionLocal()
+        print(f"데이터베이스 세션 생성 완료")
+        
+        # RSS 피드 파싱
+        feed = feedparser.parse(feed_url)
+        print(f"RSS 피드 파싱 완료 - 엔트리 수: {len(feed.entries)}")
+        
+        processed = 0
+        saved = 0
+        duplicates = 0
+        queued_tasks = 0
+        
         for entry in feed.entries:
             processed += 1
             
@@ -294,7 +298,12 @@ def ingest_rss(feed_url: str, source_name: str = "rss", db: Session | None = Non
         
     except Exception as e:
         db.rollback()
-        raise e
+        print(f"RSS 수집 중 에러 발생: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+    
+    print(f"RSS 수집 완료 - processed: {processed}, saved: {saved}, duplicates: {duplicates}")
     
     return {
         "processed": processed,
