@@ -1,0 +1,21 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# package.json과 package-lock.json 복사
+COPY frontend/package*.json ./
+
+# 의존성 설치
+RUN npm install
+
+# 소스 코드 복사
+COPY frontend/ .
+
+# 빌드
+RUN npm run build
+
+# 개발 서버 실행을 위한 설정
+EXPOSE 3000
+
+# 개발 모드로 실행 (빌드된 파일 서빙)
+CMD ["npm", "start"]
