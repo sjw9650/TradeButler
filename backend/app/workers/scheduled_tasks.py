@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import logging
 
-from ..services.ingest.multi_rss import ingest_multiple_feeds
+# from ..services.ingest.multi_rss import ingest_multiple_feeds  # 순환 import 방지
 
 # 로깅 설정
 logger = logging.getLogger(__name__)
@@ -35,6 +35,8 @@ def scheduled_rss_ingestion(self, feed_groups: Optional[list] = None) -> Dict[st
     logger.info(f"스케줄링된 RSS 수집 시작 - Task ID: {task_id}")
     
     try:
+        # 순환 import 방지를 위해 함수 내에서 import
+        from ..services.ingest.multi_rss import ingest_multiple_feeds
         # RSS 피드 수집 실행
         result = ingest_multiple_feeds(feed_groups)
         

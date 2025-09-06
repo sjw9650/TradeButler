@@ -94,7 +94,7 @@ insighthub_skeleton/
 ### 1. 환경 설정
 ```bash
 # .env 파일 생성
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_API_KEY=your_openai_api_key_here
 ENV=development
 ```
 

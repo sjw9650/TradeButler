@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Settings, 
   Play, 
   RefreshCw, 
   Clock, 
   CheckCircle,
-  AlertCircle,
-  BarChart3
+  AlertCircle
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -51,7 +49,7 @@ const AISettings: React.FC = () => {
       }
       setTriggerResult({ type, result, success: true });
     } catch (error) {
-      setTriggerResult({ type, error: error.message, success: false });
+      setTriggerResult({ type, error: error instanceof Error ? error.message : 'Unknown error', success: false });
     } finally {
       setIsTriggering(null);
     }

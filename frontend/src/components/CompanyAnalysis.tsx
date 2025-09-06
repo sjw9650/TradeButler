@@ -4,8 +4,6 @@ import {
   TrendingUp, 
   Search, 
   ExternalLink,
-  Calendar,
-  BarChart3,
   RefreshCw
 } from 'lucide-react';
 import { api, Company } from '../services/api';

@@ -21,4 +21,4 @@ celery.conf.timezone = BEAT_TIMEZONE
 celery.autodiscover_tasks(['backend.app.workers'])
 
 # 태스크 수동 등록
-from . import tasks, scheduled_tasks
+# from . import tasks, scheduled_tasks  # 순환 import 방지

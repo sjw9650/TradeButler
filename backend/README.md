@@ -21,7 +21,7 @@ DB_URL=postgresql+psycopg2://postgres:postgres@db:5432/insighthub
 REDIS_URL=redis://redis:6379/0
 
 # OpenAI Configuration (실제 API 키로 교체하세요)
-OPENAI_API_KEY=sk-proj-your-actual-openai-api-key-here
+OPENAI_API_KEY=your_openai_api_key_here
 
 # AWS S3 Configuration (optional)
 S3_ENDPOINT=

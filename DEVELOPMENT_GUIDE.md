@@ -39,7 +39,7 @@ cd TradeButler
 cp .env.example .env
 
 # OpenAI API 키 설정
-echo "OPENAI_API_KEY=your_openai_api_key" >> .env
+echo "OPENAI_API_KEY=your_openai_api_key_here" >> .env
 echo "ENV=development" >> .env
 ```
 
@@ -248,7 +248,7 @@ test('renders dashboard title', () => {
 ### 1. 프로덕션 환경 설정
 ```bash
 # .env.production 파일 생성
-OPENAI_API_KEY=your_production_key
+OPENAI_API_KEY=your_production_key_here
 ENV=production
 DATABASE_URL=postgresql://user:pass@host:port/db
 REDIS_URL=redis://host:port/0
