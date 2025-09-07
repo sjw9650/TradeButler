@@ -77,7 +77,7 @@ def get_summaries(
                 "insight": content.insight,
                 "tags": content.tags,
                 "lang": content.lang,
-                "created_at": content.created_at.isoformat()
+                "created_at": content.published_at.isoformat() if content.published_at else None
             })
         
         db.close()
@@ -132,7 +132,7 @@ def get_summary(content_id: int) -> Dict[str, Any]:
             "insight": content.insight,
             "tags": content.tags,
             "lang": content.lang,
-            "created_at": content.created_at.isoformat()
+            "created_at": content.published_at.isoformat() if content.published_at else None
         }
         
     except HTTPException:

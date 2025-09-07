@@ -11,6 +11,7 @@ import {
 import Dashboard from './components/Dashboard';
 import NewsSummaries from './components/NewsSummaries';
 import CompanyAnalysis from './components/CompanyAnalysis';
+import CompanyFollowing from './components/CompanyFollowing';
 import AISettings from './components/AISettings';
 import { API_BASE_URL } from './services/api';
 
@@ -102,6 +103,15 @@ function App() {
                 </li>
                 <li>
                   <Link
+                    to="/following"
+                    className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <TrendingUp className="h-5 w-5 mr-3" />
+                    기업 팔로잉
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="/settings"
                     className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                   >
@@ -119,6 +129,7 @@ function App() {
               <Route path="/" element={<Dashboard stats={stats} />} />
               <Route path="/news" element={<NewsSummaries />} />
               <Route path="/companies" element={<CompanyAnalysis />} />
+              <Route path="/following" element={<CompanyFollowing userId="test_user" />} />
               <Route path="/settings" element={<AISettings />} />
             </Routes>
           </main>

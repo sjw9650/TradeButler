@@ -30,7 +30,9 @@ def get_companies(
     offset: int = Query(0, ge=0, description="오프셋"),
     search: Optional[str] = Query(None, description="기업명 검색"),
     industry: Optional[str] = Query(None, description="업종 필터"),
-    sort_by: str = Query("mentions", description="정렬 기준 (mentions/name/created)")
+    sort_by: str = Query("mentions", description="정렬 기준 (mentions/name/created)"),
+    order: str = Query("desc", description="정렬 순서 (asc/desc)"),
+    user_id: Optional[str] = Query(None, description="사용자 ID (팔로잉 상태 포함)")
 ) -> Dict[str, Any]:
     """
     기업 목록을 조회합니다.
@@ -67,9 +69,33 @@ def get_companies(
         
         total = repo.count_companies(search=search, industry=industry)
         
+        # 팔로잉 상태 조회 (사용자 ID가 제공된 경우)
+        following_companies = set()
+        if user_id:
+            following_records = db.query(UserFollowing).filter(
+                UserFollowing.user_id == user_id
+            ).all()
+            following_companies = {record.company_id for record in following_records}
+        
         # 응답 데이터 구성
         company_list = []
         for company in companies:
+            is_following = company.id in following_companies if user_id else False
+            following_info = None
+            
+            if is_following and user_id:
+                following_record = db.query(UserFollowing).filter(
+                    UserFollowing.user_id == user_id,
+                    UserFollowing.company_id == company.id
+                ).first()
+                if following_record:
+                    following_info = {
+                        "priority": following_record.priority,
+                        "notification_enabled": following_record.notification_enabled,
+                        "auto_summarize": following_record.auto_summarize,
+                        "followed_at": following_record.created_at.isoformat()
+                    }
+            
             company_list.append({
                 "id": company.id,
                 "name": company.name,
@@ -81,7 +107,9 @@ def get_companies(
                 "last_mentioned_at": company.last_mentioned_at.isoformat() if company.last_mentioned_at else None,
                 "confidence_score": company.confidence_score,
                 "is_active": company.is_active,
-                "created_at": company.created_at.isoformat()
+                "created_at": company.created_at.isoformat(),
+                "is_following": is_following,
+                "following_info": following_info
             })
         
         db.close()
@@ -473,3 +501,130 @@ def get_company_trends(
     except Exception as e:
         logger.error(f"기업 트렌드 분석 조회 실패: {str(e)}")
         raise HTTPException(status_code=500, detail=f"기업 트렌드 분석 조회 실패: {str(e)}")
+
+
+@router.get("/companies/recommendations/{user_id}", summary="기업 추천")
+def get_company_recommendations(
+    user_id: str,
+    limit: int = Query(10, ge=1, le=20, description="추천 개수"),
+    industry: Optional[str] = Query(None, description="산업 필터")
+) -> Dict[str, Any]:
+    """
+    사용자에게 기업을 추천합니다.
+    
+    Parameters
+    ----------
+    user_id : str
+        사용자 ID
+    limit : int
+        추천 개수
+    industry : Optional[str]
+        산업 필터
+        
+    Returns
+    -------
+    Dict[str, Any]
+        추천 기업 목록
+    """
+    try:
+        db = SessionLocal()
+        repo = CompanyRepo(db)
+        
+        # 현재 팔로잉 중인 기업 조회
+        following_companies = db.query(UserFollowing).filter(
+            UserFollowing.user_id == user_id
+        ).all()
+        following_company_ids = {f.company_id for f in following_companies}
+        
+        # 팔로잉 중인 기업의 산업 분포 분석
+        following_industries = {}
+        for following in following_companies:
+            company = repo.get_by_id(following.company_id)
+            if company and company.industry:
+                following_industries[company.industry] = following_industries.get(company.industry, 0) + 1
+        
+        # 추천 로직: 언급 수가 많고 팔로잉하지 않은 기업
+        query = db.query(Company).filter(
+            Company.is_active == True,
+            ~Company.id.in_(following_company_ids)
+        )
+        
+        if industry:
+            query = query.filter(Company.industry == industry)
+        
+        # 언급 수 기준으로 정렬
+        recommended_companies = query.order_by(
+            Company.total_mentions.desc()
+        ).limit(limit * 2).all()  # 더 많이 가져와서 필터링
+        
+        # 추천 점수 계산
+        recommendations = []
+        for company in recommended_companies:
+            score = company.total_mentions or 0
+            
+            # 산업 일치 보너스
+            if company.industry in following_industries:
+                score += following_industries[company.industry] * 10
+            
+            # 신뢰도 보너스
+            if company.confidence_score:
+                score += company.confidence_score * 5
+            
+            recommendations.append({
+                "company": company,
+                "score": score,
+                "reason": _get_recommendation_reason(company, following_industries)
+            })
+        
+        # 점수 기준으로 정렬하고 상위 limit개 선택
+        recommendations.sort(key=lambda x: x["score"], reverse=True)
+        top_recommendations = recommendations[:limit]
+        
+        # 응답 데이터 구성
+        recommendation_list = []
+        for rec in top_recommendations:
+            company = rec["company"]
+            recommendation_list.append({
+                "id": company.id,
+                "name": company.name,
+                "display_name": company.display_name,
+                "industry": company.industry,
+                "stock_symbol": company.stock_symbol,
+                "total_mentions": company.total_mentions,
+                "confidence_score": company.confidence_score,
+                "recommendation_score": rec["score"],
+                "reason": rec["reason"]
+            })
+        
+        db.close()
+        
+        return {
+            "user_id": user_id,
+            "recommendations": recommendation_list,
+            "total": len(recommendation_list),
+            "following_industries": following_industries,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"기업 추천 실패: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"기업 추천 실패: {str(e)}")
+
+
+def _get_recommendation_reason(company, following_industries):
+    """추천 이유를 생성합니다."""
+    reasons = []
+    
+    if company.total_mentions and company.total_mentions > 50:
+        reasons.append("높은 언급 빈도")
+    
+    if company.industry in following_industries:
+        reasons.append(f"관심 산업 ({company.industry})")
+    
+    if company.confidence_score and company.confidence_score > 0.8:
+        reasons.append("높은 신뢰도")
+    
+    if company.stock_symbol:
+        reasons.append("상장 기업")
+    
+    return ", ".join(reasons) if reasons else "일반 추천"

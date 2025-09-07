@@ -9,6 +9,7 @@ import openai
 import json
 import re
 from typing import List, Dict, Any, Optional, Tuple
+from datetime import datetime
 from sqlalchemy.orm import Session
 from ..models.company import Company, CompanyMention
 from ..models.content import Content
@@ -251,7 +252,6 @@ class CompanyExtractor:
             from ..models.cost_log import CostLog
             
             cost = calculate_openai_cost(
-                model=self.model,
                 tokens_in=usage.prompt_tokens,
                 tokens_out=usage.completion_tokens
             )

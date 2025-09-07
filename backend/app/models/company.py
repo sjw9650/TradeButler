@@ -113,7 +113,7 @@ class CompanyMention(Base):
     
     # 관계
     company = relationship("Company", back_populates="mentions")
-    content = relationship("Content", backref="company_mentions")
+    # content = relationship("Content", backref="company_mentions")  # 순환 import 방지
     
     # 인덱스
     __table_args__ = (
