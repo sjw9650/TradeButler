@@ -154,19 +154,6 @@ function App() {
                 </ul>
               </div>
               
-              <div className="border-t border-gray-200 pt-6">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-900">프리미엄</p>
-                      <p className="text-xs text-gray-500">고급 분석 기능</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </nav>
           

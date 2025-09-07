@@ -102,7 +102,6 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
   // 기업 팔로잉
   const followCompany = async (companyId: number, priority: number = 1) => {
     try {
-      // 로딩 상태 설정
       setLoading(true);
       
       const response = await fetch(`/v1/companies/${companyId}/follow?user_id=${userId}&priority=${priority}`, {
@@ -110,14 +109,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
       });
 
       if (response.ok) {
-        // 성공 시 즉시 UI 업데이트
-        setCompanies(prev => prev.map(company => 
-          company.id === companyId 
-            ? { ...company, is_following: true, following_info: { priority, notification_enabled: true, auto_summarize: true, followed_at: new Date().toISOString() } }
-            : company
-        ));
-        
-        // 데이터 새로고침
+        // 데이터 새로고침만 수행 (API에서 최신 상태 반환)
         await Promise.all([
           fetchCompanies(),
           fetchFollowing(),
@@ -136,7 +128,6 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
   // 기업 언팔로잉
   const unfollowCompany = async (companyId: number) => {
     try {
-      // 로딩 상태 설정
       setLoading(true);
       
       const response = await fetch(`/v1/companies/${companyId}/unfollow?user_id=${userId}`, {
@@ -144,14 +135,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
       });
 
       if (response.ok) {
-        // 성공 시 즉시 UI 업데이트
-        setCompanies(prev => prev.map(company => 
-          company.id === companyId 
-            ? { ...company, is_following: false, following_info: undefined }
-            : company
-        ));
-        
-        // 데이터 새로고침
+        // 데이터 새로고침만 수행 (API에서 최신 상태 반환)
         await Promise.all([
           fetchCompanies(),
           fetchFollowing(),
@@ -416,7 +400,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
         >
           <div className="flex items-center justify-center gap-2">
             <Star className="w-4 h-4" />
-            팔로잉 중
+            내가 팔로잉하는 기업
             <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">
               {following.length}
             </span>
@@ -449,9 +433,29 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
         )}
         
         {activeTab === 'following' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {following.map(company => renderCompanyCard(company))}
-          </div>
+          <>
+            {/* 팔로잉 중 탭 설명 */}
+            {following.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Star className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-blue-900 mb-1">팔로잉 중인 기업</h3>
+                    <p className="text-sm text-blue-700">
+                      이 기업들의 뉴스는 자동으로 요약되어 대시보드에 표시됩니다. 
+                      언제든지 팔로잉을 해제할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {following.map(company => renderCompanyCard(company))}
+            </div>
+          </>
         )}
         
         {activeTab === 'recommendations' && (
@@ -473,7 +477,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
             {activeTab === 'recommendations' && '추천 기업이 없습니다'}
           </h3>
           <p className="text-gray-500">
-            {activeTab === 'following' && '관심 있는 기업을 팔로잉해보세요!'}
+            {activeTab === 'following' && '관심 있는 기업을 팔로잉해보세요! 팔로잉한 기업의 뉴스는 자동으로 요약됩니다.'}
             {activeTab === 'recommendations' && '더 많은 뉴스를 수집하면 추천이 나타납니다.'}
           </p>
         </div>
