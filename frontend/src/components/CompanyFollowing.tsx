@@ -186,7 +186,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span>언급: {company.total_mentions}회</span>
               <span>신뢰도: {Math.round((company.confidence_score || 0) * 100)}%</span>
-              {isFollowing && priority > 0 && (
+              {isFollowing && priority && priority > 0 && (
                 <span className="text-yellow-600">우선순위: {priority}</span>
               )}
             </div>
