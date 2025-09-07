@@ -4,7 +4,11 @@ import {
   RefreshCw, 
   Clock, 
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  Calendar,
+  Zap,
+  BarChart3
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -77,9 +81,64 @@ const AISettings: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">AI 설정</h1>
-        <p className="text-gray-600">RSS 수집 스케줄과 AI 분석 설정을 관리하세요</p>
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-2xl p-8 text-white">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white/20 rounded-xl">
+            <Settings className="h-8 w-8" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">TradeButler 설정</h1>
+            <p className="text-green-100 text-lg">자동 수집 스케줄 및 AI 분석 설정</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 자동 스케줄 정보 */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="flex items-center gap-3 mb-6">
+          <Calendar className="h-6 w-6 text-green-600" />
+          <h2 className="text-lg font-semibold text-gray-900">자동 수집 스케줄</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-5 w-5 text-green-600" />
+              <span className="font-medium text-green-800">한국 뉴스</span>
+            </div>
+            <p className="text-sm text-green-700">30분마다 자동 수집</p>
+            <p className="text-xs text-green-600 mt-1">한국경제 경제/금융 뉴스</p>
+          </div>
+          
+          <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-5 w-5 text-blue-600" />
+              <span className="font-medium text-blue-800">미국 뉴스</span>
+            </div>
+            <p className="text-sm text-blue-700">30분마다 자동 수집</p>
+            <p className="text-xs text-blue-600 mt-1">Yahoo Finance, CoinDesk</p>
+          </div>
+          
+          <div className="bg-purple-50 p-4 rounded-xl border border-purple-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="h-5 w-5 text-purple-600" />
+              <span className="font-medium text-purple-800">인기 뉴스 분석</span>
+            </div>
+            <p className="text-sm text-purple-700">30분마다 AI 요약</p>
+            <p className="text-xs text-purple-600 mt-1">상위 10개 기사 자동 분석</p>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="h-5 w-5 text-gray-600" />
+            <span className="font-medium text-gray-800">스케줄 상태</span>
+          </div>
+          <p className="text-sm text-gray-600">
+            모든 자동 스케줄이 정상적으로 실행 중입니다. 
+            수동 트리거는 긴급한 상황에서만 사용하세요.
+          </p>
+        </div>
       </div>
 
       {/* 수동 트리거 */}

@@ -4,6 +4,7 @@ from ..models.content import Content, AICache
 from ..models.cost_log import CostLog
 from ..core.config import settings
 from ..utils.cost_calculator import calculate_openai_cost
+from ..services.popular_news_analyzer import PopularNewsAnalyzer
 import json
 from openai import OpenAI
 from typing import List, Dict, Any
@@ -308,5 +309,35 @@ def summarize_task(content_id: int):
     except Exception as e:
         db.rollback()
         return {"content_id": content_id, "status": "error", "error": str(e)}
+    finally:
+        db.close()
+
+
+@celery.task
+def process_popular_news_task(limit: int = 10):
+    """
+    인기 뉴스 10개를 선별하고 AI 요약을 생성하는 태스크
+    
+    Parameters
+    ----------
+    limit : int
+        처리할 뉴스 개수 (기본값: 10)
+        
+    Returns
+    -------
+    Dict[str, Any]
+        처리 결과
+    """
+    db = SessionLocal()
+    try:
+        analyzer = PopularNewsAnalyzer(db)
+        result = analyzer.process_popular_news(limit)
+        
+        logger.info(f"인기 뉴스 처리 태스크 완료: {result}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"인기 뉴스 처리 태스크 실패: {str(e)}")
+        return {"status": "error", "message": str(e)}
     finally:
         db.close()

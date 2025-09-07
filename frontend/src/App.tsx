@@ -12,7 +12,7 @@ import {
   Bell,
   User
 } from 'lucide-react';
-import Dashboard from './components/Dashboard';
+import MarketIndices from './components/MarketIndices';
 import NewsSummaries from './components/NewsSummaries';
 import CompanyAnalysis from './components/CompanyAnalysis';
 import CompanyFollowing from './components/CompanyFollowing';
@@ -79,7 +79,7 @@ function App() {
             <RefreshCw className="h-12 w-12 animate-spin mx-auto mb-6 text-blue-600" />
             <div className="absolute inset-0 rounded-full border-4 border-blue-200"></div>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">InsightHub 로딩 중</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">TradeButler 로딩 중</h2>
           <p className="text-gray-600">데이터를 불러오고 있습니다...</p>
         </div>
       </div>
@@ -100,16 +100,16 @@ function App() {
                 >
                   {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
-                <div className="flex items-center">
+                <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
                   <div className="relative">
-                    <TrendingUp className="h-8 w-8 text-blue-600 mr-3" />
+                    <TrendingUp className="h-8 w-8 text-green-600 mr-3" />
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">InsightHub</h1>
-                    <p className="text-xs text-gray-500">AI 기반 뉴스 분석 플랫폼</p>
+                    <h1 className="text-xl font-bold text-gray-900">TradeButler</h1>
+                    <p className="text-xs text-gray-500">AI 투자 분석 플랫폼</p>
                   </div>
-                </div>
+                </Link>
               </div>
               
               <div className="flex items-center space-x-6">
@@ -146,11 +146,11 @@ function App() {
               <div className="mb-8">
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">메뉴</h2>
                 <ul className="space-y-1">
-                  <NavItem to="/" icon={BarChart3} label="대시보드" />
+                  <NavItem to="/" icon={BarChart3} label="시장 지수" />
                   <NavItem to="/news" icon={Newspaper} label="뉴스 요약" />
                   <NavItem to="/companies" icon={Building2} label="기업 분석" />
                   <NavItem to="/following" icon={TrendingUp} label="기업 팔로잉" />
-                  <NavItem to="/settings" icon={Settings} label="AI 설정" />
+                  <NavItem to="/settings" icon={Settings} label="설정" />
                 </ul>
               </div>
               
@@ -169,7 +169,7 @@ function App() {
           <main className="flex-1 p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
               <Routes>
-                <Route path="/" element={<Dashboard stats={stats} />} />
+                <Route path="/" element={<MarketIndices />} />
                 <Route path="/news" element={<NewsSummaries />} />
                 <Route path="/companies" element={<CompanyAnalysis />} />
                 <Route path="/following" element={<CompanyFollowing userId="test_user" />} />

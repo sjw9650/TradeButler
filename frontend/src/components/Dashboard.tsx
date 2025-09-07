@@ -108,31 +108,14 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
             <h1 className="text-3xl font-bold mb-2">대시보드</h1>
             <p className="text-blue-100 text-lg">AI 기반 뉴스 분석 현황을 한눈에 확인하세요</p>
           </div>
-          <div className="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => handleTrigger('korean')}
-              disabled={isLoading}
-              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
-              ) : (
-                <Play className="h-5 w-5 mr-2" />
-              )}
-              한국 뉴스 수집
-            </button>
-            <button
-              onClick={() => handleTrigger('us')}
-              disabled={isLoading}
-              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
-              ) : (
-                <Play className="h-5 w-5 mr-2" />
-              )}
-              미국 뉴스 수집
-            </button>
+          <div className="mt-6 lg:mt-0 flex items-center gap-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+              <div className="flex items-center gap-2 text-white/90">
+                <Clock className="h-5 w-5" />
+                <span className="text-sm font-medium">자동 수집: 30분 주기</span>
+              </div>
+              <p className="text-white/70 text-xs mt-1">한국/미국 뉴스 자동 수집 중</p>
+            </div>
           </div>
         </div>
       </div>

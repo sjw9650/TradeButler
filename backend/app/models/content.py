@@ -18,6 +18,10 @@ class Content(Base):
     summary_bullets = Column(JSONB)  # 최대 5개 bullet points
     insight = Column(Text)  # 2-3문장
     tags = Column(JSONB)  # 상위 N개 태그
+    is_active = Column(String(10), default="active")  # active, inactive, deleted
+    ai_summary_status = Column(String(20), default="pending")  # pending, processing, completed, failed
+    ai_summarized_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
         UniqueConstraint("hash", name="uq_content_hash"),
