@@ -64,73 +64,87 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* 헤더 */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
-          <p className="text-gray-600">AI 기반 뉴스 분석 현황</p>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handleTrigger('korean')}
-            disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center"
-          >
-            <Play className="h-4 w-4 mr-2" />
-            한국 뉴스 수집
-          </button>
-          <button
-            onClick={() => handleTrigger('us')}
-            disabled={isLoading}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center"
-          >
-            <Play className="h-4 w-4 mr-2" />
-            미국 뉴스 수집
-          </button>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">대시보드</h1>
+            <p className="text-blue-100 text-lg">AI 기반 뉴스 분석 현황을 한눈에 확인하세요</p>
+          </div>
+          <div className="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => handleTrigger('korean')}
+              disabled={isLoading}
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30"
+            >
+              <Play className="h-5 w-5 mr-2" />
+              한국 뉴스 수집
+            </button>
+            <button
+              onClick={() => handleTrigger('us')}
+              disabled={isLoading}
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30"
+            >
+              <Play className="h-5 w-5 mr-2" />
+              미국 뉴스 수집
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 통계 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">총 기사 수</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total_contents.toLocaleString()}</p>
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-600 mb-2">총 기사 수</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.total_contents.toLocaleString()}</p>
+              <p className="text-xs text-gray-500 mt-1">수집된 뉴스 기사</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+              <BarChart3 className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center">
-            <TrendingUp className="h-8 w-8 text-green-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">AI 분석 완료</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.ai_summarized.toLocaleString()}</p>
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-600 mb-2">AI 분석 완료</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.ai_summarized.toLocaleString()}</p>
+              <p className="text-xs text-gray-500 mt-1">요약 완료된 기사</p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+              <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center">
-            <Building2 className="h-8 w-8 text-purple-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">AI 분석률</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.ai_summary_rate}%</p>
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-600 mb-2">AI 분석률</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.ai_summary_rate}%</p>
+              <p className="text-xs text-gray-500 mt-1">자동 분석 완료율</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+              <Building2 className="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center">
-            <Globe className="h-8 w-8 text-orange-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">언어</p>
-              <p className="text-2xl font-bold text-gray-900">
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-600 mb-2">언어</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {Object.keys(stats.language_stats).length}개
               </p>
+              <p className="text-xs text-gray-500 mt-1">지원 언어 수</p>
+            </div>
+            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+              <Globe className="h-6 w-6 text-orange-600" />
             </div>
           </div>
         </div>
