@@ -5,6 +5,7 @@ from ..models.cost_log import CostLog
 from ..core.config import settings
 from ..utils.cost_calculator import calculate_openai_cost
 from ..services.popular_news_analyzer import PopularNewsAnalyzer
+from ..services.social_metrics_collector import SocialMetricsCollector
 import json
 from openai import OpenAI
 from typing import List, Dict, Any
@@ -338,6 +339,85 @@ def process_popular_news_task(limit: int = 10):
         
     except Exception as e:
         logger.error(f"인기 뉴스 처리 태스크 실패: {str(e)}")
+        return {"status": "error", "message": str(e)}
+    finally:
+        db.close()
+
+
+@celery.task
+def collect_social_metrics_task():
+    """
+    소셜 미디어 메트릭을 수집하는 태스크
+    
+    Returns
+    -------
+    Dict[str, Any]
+        수집 결과
+    """
+    db = SessionLocal()
+    try:
+        # 최근 24시간 내의 뉴스 중 메트릭이 없는 것들 조회
+        cutoff_time = datetime.utcnow() - timedelta(hours=24)
+        contents = db.query(Content).filter(
+            and_(
+                Content.published_at >= cutoff_time,
+                Content.is_active == "active",
+                Content.view_count == 0  # 메트릭이 없는 것들
+            )
+        ).limit(50).all()  # 한 번에 50개씩 처리
+        
+        if not contents:
+            return {
+                "status": "no_content",
+                "message": "수집할 메트릭이 없습니다.",
+                "processed_count": 0
+            }
+        
+        # 소셜 미디어 메트릭 수집기 초기화
+        collector = SocialMetricsCollector()
+        
+        processed_count = 0
+        results = []
+        
+        for content in contents:
+            try:
+                # 메트릭 수집
+                metrics = collector.collect_metrics(content.url, content.source)
+                
+                # 데이터베이스 업데이트
+                content.view_count = metrics.get('view_count', 0)
+                content.like_count = metrics.get('like_count', 0)
+                content.share_count = metrics.get('share_count', 0)
+                content.comment_count = metrics.get('comment_count', 0)
+                content.engagement_score = metrics.get('engagement_score', 'low')
+                
+                processed_count += 1
+                results.append({
+                    "content_id": content.id,
+                    "title": content.title[:50] + "...",
+                    "view_count": content.view_count,
+                    "engagement_score": content.engagement_score
+                })
+                
+            except Exception as e:
+                logger.error(f"메트릭 수집 실패 (콘텐츠 {content.id}): {str(e)}")
+                continue
+        
+        # 데이터베이스 커밋
+        db.commit()
+        
+        logger.info(f"소셜 미디어 메트릭 수집 완료: {processed_count}/{len(contents)}")
+        
+        return {
+            "status": "success",
+            "processed_count": processed_count,
+            "total_found": len(contents),
+            "results": results
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"소셜 미디어 메트릭 수집 태스크 실패: {str(e)}")
         return {"status": "error", "message": str(e)}
     finally:
         db.close()

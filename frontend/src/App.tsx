@@ -17,6 +17,7 @@ import NewsSummaries from './components/NewsSummaries';
 import CompanyAnalysis from './components/CompanyAnalysis';
 import CompanyFollowing from './components/CompanyFollowing';
 import AISettings from './components/AISettings';
+import GoogleLogin from './components/GoogleLogin';
 import { API_BASE_URL } from './services/api';
 
 // NavItem 컴포넌트
@@ -50,10 +51,21 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon: Icon, label }) => {
   );
 };
 
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  picture?: string;
+  is_premium: boolean;
+  subscription_tier: string;
+}
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
@@ -69,6 +81,16 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLogin = (user: User, token: string) => {
+    setUser(user);
+    setSessionToken(token);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setSessionToken(null);
   };
 
   if (isLoading) {
@@ -130,9 +152,7 @@ function App() {
                     <Bell className="h-5 w-5" />
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   </button>
-                  <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    <User className="h-5 w-5" />
-                  </button>
+                  <GoogleLogin onLogin={handleLogin} onLogout={handleLogout} />
                 </div>
               </div>
             </div>

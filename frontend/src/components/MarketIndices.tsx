@@ -11,6 +11,14 @@ interface MarketData {
   market: 'KOSPI' | 'KOSDAQ' | 'NASDAQ' | 'NYSE' | 'NIKKEI';
 }
 
+interface NewsMetrics {
+  view_count: number;
+  like_count: number;
+  share_count: number;
+  comment_count: number;
+  engagement_score: string;
+}
+
 const MarketIndices: React.FC = () => {
   const [marketData, setMarketData] = useState<MarketData[]>([]);
   const [loading, setLoading] = useState(true);

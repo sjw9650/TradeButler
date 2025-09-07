@@ -11,6 +11,8 @@ from datetime import datetime, timedelta
 import logging
 
 from ...repo.db import SessionLocal, get_db
+from ...core.oauth import get_current_user_optional
+from ...models.user import User
 from ...repo.company import CompanyRepo
 from ...models.company import Company, UserFollowing, CompanyMention
 from ...services.following_cache import FollowingCacheService

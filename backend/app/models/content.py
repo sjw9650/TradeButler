@@ -22,6 +22,13 @@ class Content(Base):
     ai_summary_status = Column(String(20), default="pending")  # pending, processing, completed, failed
     ai_summarized_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # 인기도 메트릭
+    view_count = Column(Integer, default=0)  # 조회수
+    like_count = Column(Integer, default=0)  # 좋아요 수
+    share_count = Column(Integer, default=0)  # 공유 수
+    comment_count = Column(Integer, default=0)  # 댓글 수
+    engagement_score = Column(String(20), default="low")  # low, medium, high, viral
 
     __table_args__ = (
         UniqueConstraint("hash", name="uq_content_hash"),

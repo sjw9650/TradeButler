@@ -39,6 +39,16 @@ BEAT_SCHEDULE = {
         }
     },
     
+    # 소셜 미디어 메트릭 수집 (15분마다)
+    'social-metrics-collection': {
+        'task': 'collect_social_metrics_task',
+        'schedule': crontab(minute='*/15'),  # 15분마다
+        'options': {
+            'queue': 'rss_ingestion',
+            'priority': 4
+        }
+    },
+    
     # 인기 뉴스 분석 (30분마다)
     'popular-news-analysis': {
         'task': 'process_popular_news_task',
@@ -68,6 +78,7 @@ SCHEDULE_DESCRIPTIONS = {
     'korean-news-30min': '한국 뉴스 RSS 수집 (30분마다)',
     'us-news-30min': '미국 뉴스 RSS 수집 (30분마다)', 
     'all-news-daily': '전체 뉴스 RSS 수집 (매일 새벽 2시)',
+    'social-metrics-collection': '소셜 미디어 메트릭 수집 (15분마다)',
     'popular-news-analysis': '인기 뉴스 10개 AI 요약 (30분마다)',
     'health-check': '시스템 상태 확인 (5분마다)'
 }

@@ -76,7 +76,7 @@ class PopularNewsAnalyzer:
     
     def analyze_popularity_score(self, content: Content) -> float:
         """
-        뉴스의 인기도 점수를 계산합니다.
+        뉴스의 인기도 점수를 계산합니다. (소셜 미디어 메트릭 기반)
         
         Parameters
         ----------
@@ -90,57 +90,101 @@ class PopularNewsAnalyzer:
         """
         score = 0.0
         
-        # 1. 시간 가중치 (최신성)
-        hours_ago = (datetime.utcnow() - content.published_at).total_seconds() / 3600
-        if hours_ago <= 1:
-            score += 40  # 최근 1시간 내
-        elif hours_ago <= 6:
-            score += 30  # 최근 6시간 내
-        elif hours_ago <= 24:
-            score += 20  # 최근 24시간 내
-        else:
-            score += 10  # 그 외
+        # 1. 소셜 미디어 참여도 (가장 중요) - 50점
+        engagement_score = self._calculate_engagement_score(content)
+        score += engagement_score
         
-        # 2. 제목 길이 (적절한 길이 선호)
-        title_length = len(content.title)
-        if 20 <= title_length <= 80:
-            score += 20
-        elif 10 <= title_length <= 100:
-            score += 15
-        else:
-            score += 10
+        # 2. 조회수 기반 점수 - 25점
+        view_score = self._calculate_view_score(content.view_count or 0)
+        score += view_score
         
-        # 3. 소스 신뢰도
-        if 'hankyung' in content.source.lower():
-            score += 20  # 한국경제
-        elif 'yahoo' in content.source.lower():
-            score += 15  # Yahoo Finance
-        elif 'coindesk' in content.source.lower():
-            score += 10  # CoinDesk
-        else:
-            score += 5
+        # 3. 시간 가중치 (최신성) - 15점
+        time_score = self._calculate_time_score(content.published_at)
+        score += time_score
         
-        # 4. 언어 가중치 (한국어 우선)
-        if content.lang == 'ko':
-            score += 10
-        elif content.lang == 'en':
-            score += 5
-        
-        # 5. 키워드 가중치 (주요 키워드 포함)
-        important_keywords = [
-            '삼성', 'SK', 'LG', '현대', '기아', '네이버', '카카오',
-            '애플', '구글', '마이크로소프트', '테슬라', '아마존',
-            '주식', '증권', '투자', '경제', '금리', '인플레이션',
-            'AI', '인공지능', '반도체', '전기차', '바이오'
-        ]
-        
-        title_lower = content.title.lower()
-        for keyword in important_keywords:
-            if keyword.lower() in title_lower:
-                score += 5
-                break
+        # 4. 소스 신뢰도 - 10점
+        source_score = self._calculate_source_score(content.source)
+        score += source_score
         
         return min(score, 100.0)  # 최대 100점
+    
+    def _calculate_engagement_score(self, content: Content) -> float:
+        """참여도 점수 계산 (50점 만점)"""
+        if not content.view_count or content.view_count == 0:
+            return 0.0
+        
+        # 참여율 계산: (좋아요 + 공유 + 댓글) / 조회수
+        total_engagement = (content.like_count or 0) + (content.share_count or 0) + (content.comment_count or 0)
+        engagement_rate = total_engagement / content.view_count
+        
+        # 참여율에 따른 점수 계산
+        if engagement_rate >= 0.1:  # 10% 이상 - 바이럴
+            return 50.0
+        elif engagement_rate >= 0.05:  # 5% 이상 - 높음
+            return 40.0
+        elif engagement_rate >= 0.02:  # 2% 이상 - 보통
+            return 30.0
+        elif engagement_rate >= 0.01:  # 1% 이상 - 낮음
+            return 20.0
+        else:
+            return 10.0
+    
+    def _calculate_view_score(self, view_count: int) -> float:
+        """조회수 기반 점수 계산 (25점 만점)"""
+        if view_count == 0:
+            return 0.0
+        
+        # 조회수 구간별 점수
+        if view_count >= 10000:
+            return 25.0  # 1만 이상
+        elif view_count >= 5000:
+            return 20.0  # 5천 이상
+        elif view_count >= 2000:
+            return 15.0  # 2천 이상
+        elif view_count >= 1000:
+            return 10.0  # 1천 이상
+        elif view_count >= 500:
+            return 5.0   # 5백 이상
+        else:
+            return 2.0   # 그 외
+    
+    def _calculate_time_score(self, published_at: datetime) -> float:
+        """시간 가중치 점수 계산 (15점 만점)"""
+        if not published_at:
+            return 0.0
+        
+        hours_ago = (datetime.utcnow() - published_at).total_seconds() / 3600
+        
+        if hours_ago <= 1:
+            return 15.0  # 최근 1시간 내
+        elif hours_ago <= 6:
+            return 12.0  # 최근 6시간 내
+        elif hours_ago <= 24:
+            return 8.0   # 최근 24시간 내
+        elif hours_ago <= 72:
+            return 4.0   # 최근 3일 내
+        else:
+            return 1.0   # 그 외
+    
+    def _calculate_source_score(self, source: str) -> float:
+        """소스 신뢰도 점수 계산 (10점 만점)"""
+        if not source:
+            return 0.0
+        
+        source_lower = source.lower()
+        
+        if 'hankyung' in source_lower:
+            return 10.0  # 한국경제
+        elif 'yahoo' in source_lower:
+            return 8.0   # Yahoo Finance
+        elif 'coindesk' in source_lower:
+            return 7.0   # CoinDesk
+        elif 'bloomberg' in source_lower:
+            return 9.0   # Bloomberg
+        elif 'reuters' in source_lower:
+            return 8.5   # Reuters
+        else:
+            return 5.0   # 기타
     
     def generate_ai_summary(self, content: Content) -> Dict[str, Any]:
         """
