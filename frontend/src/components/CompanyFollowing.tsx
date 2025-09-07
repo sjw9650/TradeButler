@@ -198,12 +198,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
 
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span>언급: {company.total_mentions}회</span>
-              <span className="flex items-center gap-1">
-                신뢰도: {Math.round((company.confidence_score || 0) * 100)}%
-                <span className="text-xs text-gray-400" title="AI가 기업명을 얼마나 확실하게 인식했는지">
-                  (?)
-                </span>
-              </span>
+              <span>신뢰도: {Math.round((company.confidence_score || 0) * 100)}%</span>
               {isFollowing && priority && priority > 0 && (
                 <span className="text-yellow-600">우선순위: {priority}</span>
               )}
@@ -220,7 +215,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
             {isFollowing ? (
               <button
                 onClick={() => unfollowCompany(company.id)}
-                className="flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full hover:bg-yellow-200 transition-colors"
+                className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
               >
                 <Star className="w-4 h-4 fill-current" />
                 팔로잉 중
@@ -228,7 +223,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
             ) : (
               <button
                 onClick={() => followCompany(company.id)}
-                className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-1 px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
               >
                 <StarOff className="w-4 h-4" />
                 팔로잉
