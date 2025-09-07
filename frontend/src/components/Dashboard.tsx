@@ -17,6 +17,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     fetchSchedules();
@@ -33,6 +34,8 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
 
   const handleTrigger = async (type: 'korean' | 'us' | 'all') => {
     setIsLoading(true);
+    setMessage(null);
+    
     try {
       let result;
       switch (type) {
@@ -46,10 +49,27 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
           result = await api.triggerAllNews();
           break;
       }
+      
       console.log(`${type} 뉴스 수집 시작:`, result);
+      
       // 성공 메시지 표시
+      setMessage({
+        type: 'success',
+        text: result.message || `${type === 'korean' ? '한국' : type === 'us' ? '미국' : '전체'} 뉴스 수집이 시작되었습니다.`
+      });
+      
+      // 3초 후 메시지 자동 숨김
+      setTimeout(() => setMessage(null), 3000);
+      
     } catch (error) {
       console.error('뉴스 수집 트리거 실패:', error);
+      setMessage({
+        type: 'error',
+        text: '뉴스 수집을 시작할 수 없습니다. 다시 시도해주세요.'
+      });
+      
+      // 5초 후 에러 메시지 자동 숨김
+      setTimeout(() => setMessage(null), 5000);
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +85,22 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
 
   return (
     <div className="space-y-8">
+      {/* 메시지 표시 */}
+      {message && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+          message.type === 'success' 
+            ? 'bg-green-100 border border-green-400 text-green-700' 
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${
+              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`}></div>
+            <span className="font-medium">{message.text}</span>
+          </div>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -76,17 +112,25 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
             <button
               onClick={() => handleTrigger('korean')}
               disabled={isLoading}
-              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30"
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30 disabled:cursor-not-allowed"
             >
-              <Play className="h-5 w-5 mr-2" />
+              {isLoading ? (
+                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+              ) : (
+                <Play className="h-5 w-5 mr-2" />
+              )}
               한국 뉴스 수집
             </button>
             <button
               onClick={() => handleTrigger('us')}
               disabled={isLoading}
-              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30"
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 disabled:opacity-50 flex items-center justify-center transition-all duration-200 border border-white/30 disabled:cursor-not-allowed"
             >
-              <Play className="h-5 w-5 mr-2" />
+              {isLoading ? (
+                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+              ) : (
+                <Play className="h-5 w-5 mr-2" />
+              )}
               미국 뉴스 수집
             </button>
           </div>
