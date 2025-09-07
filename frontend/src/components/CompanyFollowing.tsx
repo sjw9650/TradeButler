@@ -62,7 +62,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
       if (searchTerm) params.append('search', searchTerm);
       if (industryFilter) params.append('industry', industryFilter);
 
-      const response = await fetch(`/v1/companies?${params}`);
+      const response = await fetch(`/v1/companies/fast?${params}`);
       const data = await response.json();
       setCompanies(data.companies || []);
     } catch (error) {
@@ -70,12 +70,12 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
     }
   };
 
-  // 팔로잉 기업 조회
+  // 팔로잉 기업 조회 (최적화된 API 사용)
   const fetchFollowing = async () => {
     try {
-      const response = await fetch(`/v1/users/${userId}/following`);
+      const response = await fetch(`/v1/companies/following?user_id=${userId}`);
       const data = await response.json();
-      setFollowing(data.following || []);
+      setFollowing(data.companies || []);
     } catch (error) {
       console.error('팔로잉 기업 조회 실패:', error);
     }
@@ -104,7 +104,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/v1/companies/${companyId}/follow?user_id=${userId}&priority=${priority}`, {
+      const response = await fetch(`/v1/companies/${companyId}/follow/fast?user_id=${userId}&priority=${priority}`, {
         method: 'POST'
       });
 
@@ -130,7 +130,7 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/v1/companies/${companyId}/unfollow?user_id=${userId}`, {
+      const response = await fetch(`/v1/companies/${companyId}/unfollow/fast?user_id=${userId}`, {
         method: 'DELETE'
       });
 

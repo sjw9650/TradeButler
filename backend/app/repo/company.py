@@ -577,3 +577,51 @@ class CompanyRepo:
             })
         
         return result
+    
+    def get_companies_by_ids(self, company_ids: List[int]) -> List[Company]:
+        """
+        ID 목록으로 기업들을 조회합니다.
+        
+        Parameters
+        ----------
+        company_ids : List[int]
+            기업 ID 목록
+            
+        Returns
+        -------
+        List[Company]
+            기업 목록
+        """
+        if not company_ids:
+            return []
+        
+        return self.db.query(Company).filter(Company.id.in_(company_ids)).all()
+    
+    def get_following_data_for_cache(self, user_id: str) -> Dict[int, Dict[str, Any]]:
+        """
+        캐시 동기화를 위한 팔로잉 데이터를 조회합니다.
+        
+        Parameters
+        ----------
+        user_id : str
+            사용자 ID
+            
+        Returns
+        -------
+        Dict[int, Dict[str, Any]]
+            팔로잉 데이터 (기업 ID -> 상세 정보)
+        """
+        following_records = self.db.query(UserFollowing).filter(
+            UserFollowing.user_id == user_id
+        ).all()
+        
+        following_data = {}
+        for record in following_records:
+            following_data[record.company_id] = {
+                "priority": record.priority,
+                "notification_enabled": record.notification_enabled,
+                "auto_summarize": record.auto_summarize,
+                "followed_at": record.created_at.isoformat()
+            }
+        
+        return following_data

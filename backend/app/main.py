@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.v1 import feed, brief, schedule, ai, companies, selective_ai
+from .api.v1 import feed, brief, schedule, ai, companies, companies_optimized, selective_ai
 from .core.config import settings
 
 app = FastAPI(title="InsightHub API", version="0.1.0")
@@ -19,6 +19,7 @@ app.include_router(brief.router)
 app.include_router(schedule.router, prefix="/v1/schedule")
 app.include_router(ai.router, prefix="/v1/ai")
 app.include_router(companies.router, prefix="/v1")
+app.include_router(companies_optimized.router, prefix="/v1")
 app.include_router(selective_ai.router, prefix="/v1/selective-ai")
 
 @app.get("/health")
