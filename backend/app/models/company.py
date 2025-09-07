@@ -22,6 +22,7 @@ class Company(Base):
     industry = Column(String(100), nullable=True, comment="업종")
     market_cap = Column(String(50), nullable=True, comment="시가총액")
     stock_symbol = Column(String(20), nullable=True, comment="주식 심볼")
+    stock_market = Column(String(20), nullable=True, comment="주식 시장 (KOSPI/KOSDAQ/NASDAQ/NYSE/기타)")
     country = Column(String(50), nullable=True, comment="국가")
     website = Column(String(500), nullable=True, comment="웹사이트")
     description = Column(Text, nullable=True, comment="기업 설명")

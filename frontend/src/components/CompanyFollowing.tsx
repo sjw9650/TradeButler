@@ -7,6 +7,7 @@ interface Company {
   display_name: string;
   industry: string;
   stock_symbol?: string;
+  stock_market?: string;
   total_mentions: number;
   confidence_score: number;
   is_following: boolean;
@@ -24,6 +25,7 @@ interface Recommendation {
   display_name: string;
   industry: string;
   stock_symbol?: string;
+  stock_market?: string;
   total_mentions: number;
   confidence_score: number;
   recommendation_score: number;
@@ -169,6 +171,17 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
                   {company.stock_symbol}
                 </span>
               )}
+              {company.stock_market && (
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  company.stock_market === 'KOSPI' ? 'bg-red-100 text-red-800' :
+                  company.stock_market === 'KOSDAQ' ? 'bg-orange-100 text-orange-800' :
+                  company.stock_market === 'NASDAQ' ? 'bg-green-100 text-green-800' :
+                  company.stock_market === 'NYSE' ? 'bg-purple-100 text-purple-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {company.stock_market}
+                </span>
+              )}
               {isRecommendation && 'recommendation_score' in company && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                   추천도: {company.recommendation_score}
@@ -185,7 +198,12 @@ const CompanyFollowing: React.FC<CompanyFollowingProps> = ({ userId }) => {
 
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span>언급: {company.total_mentions}회</span>
-              <span>신뢰도: {Math.round((company.confidence_score || 0) * 100)}%</span>
+              <span className="flex items-center gap-1">
+                신뢰도: {Math.round((company.confidence_score || 0) * 100)}%
+                <span className="text-xs text-gray-400" title="AI가 기업명을 얼마나 확실하게 인식했는지">
+                  (?)
+                </span>
+              </span>
               {isFollowing && priority && priority > 0 && (
                 <span className="text-yellow-600">우선순위: {priority}</span>
               )}

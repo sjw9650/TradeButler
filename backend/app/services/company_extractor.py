@@ -105,6 +105,8 @@ class CompanyExtractor:
             "name": "기업명",
             "aliases": ["별칭1", "별칭2"],
             "industry": "업종",
+            "stock_symbol": "주식심볼",
+            "stock_market": "KOSPI/KOSDAQ/NASDAQ/NYSE/기타",
             "relevance_score": 0.95,
             "confidence_score": 0.90,
             "mention_context": "언급된 문맥",
@@ -116,7 +118,8 @@ class CompanyExtractor:
 주의사항:
 - 확실한 기업명만 추출
 - 정부기관, 단체는 제외
-- 주식 심볼이나 코드는 별칭에 포함
+- 주식 심볼은 stock_symbol 필드에, 별칭은 aliases에 포함
+- stock_market은 한국 기업은 KOSPI/KOSDAQ, 미국 기업은 NASDAQ/NYSE로 구분
 - 관련도와 신뢰도는 0-1 사이 값
 - 감정은 기업에 대한 언급의 톤
 """
@@ -197,6 +200,8 @@ class CompanyExtractor:
                 name=company["name"],
                 display_name=company["name"],
                 industry=company.get("industry"),
+                stock_symbol=company.get("stock_symbol"),
+                stock_market=company.get("stock_market"),
                 aliases=company.get("aliases", []),
                 keywords=company.get("keywords", []),
                 confidence_score=company.get("confidence_score"),
