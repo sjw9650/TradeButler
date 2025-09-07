@@ -16,6 +16,7 @@ import MarketIndices from './components/MarketIndices';
 import NewsSummaries from './components/NewsSummaries';
 import CompanyAnalysis from './components/CompanyAnalysis';
 import CompanyFollowing from './components/CompanyFollowing';
+import CompanyDashboard from './components/CompanyDashboard';
 import AISettings from './components/AISettings';
 import GoogleLogin from './components/GoogleLogin';
 import { API_BASE_URL } from './services/api';
@@ -166,11 +167,12 @@ function App() {
               <div className="mb-8">
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">메뉴</h2>
                 <ul className="space-y-1">
-                  <NavItem to="/" icon={BarChart3} label="시장 지수" />
-                  <NavItem to="/news" icon={Newspaper} label="뉴스 요약" />
-                  <NavItem to="/companies" icon={Building2} label="기업 분석" />
-                  <NavItem to="/following" icon={TrendingUp} label="기업 팔로잉" />
-                  <NavItem to="/settings" icon={Settings} label="설정" />
+            <NavItem to="/" icon={BarChart3} label="시장 지수" />
+            <NavItem to="/news" icon={Newspaper} label="뉴스 요약" />
+            <NavItem to="/companies" icon={Building2} label="기업 분석" />
+            <NavItem to="/following" icon={TrendingUp} label="기업 팔로잉" />
+            <NavItem to="/dashboard" icon={BarChart3} label="기업 대시보드" />
+            <NavItem to="/settings" icon={Settings} label="설정" />
                 </ul>
               </div>
               
@@ -188,13 +190,14 @@ function App() {
           {/* Main Content */}
           <main className="flex-1 p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
-              <Routes>
-                <Route path="/" element={<MarketIndices />} />
-                <Route path="/news" element={<NewsSummaries />} />
-                <Route path="/companies" element={<CompanyAnalysis />} />
-                <Route path="/following" element={<CompanyFollowing userId="test_user" />} />
-                <Route path="/settings" element={<AISettings />} />
-              </Routes>
+        <Routes>
+          <Route path="/" element={<MarketIndices />} />
+          <Route path="/news" element={<NewsSummaries />} />
+          <Route path="/companies" element={<CompanyAnalysis />} />
+          <Route path="/following" element={<CompanyFollowing userId="test_user" />} />
+          <Route path="/dashboard" element={<CompanyDashboard />} />
+          <Route path="/settings" element={<AISettings />} />
+        </Routes>
             </div>
           </main>
         </div>
