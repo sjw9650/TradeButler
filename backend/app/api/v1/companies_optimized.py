@@ -193,7 +193,7 @@ def follow_company_fast(
     try:
         # 기업 존재 여부 확인
         repo = CompanyRepo(db)
-        company = repo.get_company_by_id(company_id)
+        company = repo.get_by_id(company_id)
         if not company:
             raise HTTPException(status_code=404, detail="기업을 찾을 수 없습니다")
         
