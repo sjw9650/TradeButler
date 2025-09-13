@@ -15,3 +15,10 @@ openai
 python-jose[cryptography]
 python-multipart
 passlib[bcrypt]
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+yfinance
+pykrx
+pandas
+numpy

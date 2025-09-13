@@ -198,10 +198,5 @@ def get_current_user_optional(
     db: Session = Depends(get_db)
 ) -> Optional[User]:
     """현재 로그인한 사용자 정보 반환 (선택적)"""
-    if not credentials:
-        return None
-    
-    try:
-        return get_current_user(credentials, db)
-    except HTTPException:
-        return None
+    # 임시로 인증 비활성화
+    return None

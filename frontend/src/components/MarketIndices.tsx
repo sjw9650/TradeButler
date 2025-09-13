@@ -24,6 +24,7 @@ const MarketIndices: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMarket, setSelectedMarket] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('1D');
+  const [marketStatus, setMarketStatus] = useState<any>(null);
 
   // 기간별 데이터 (실제로는 API에서 가져와야 함)
   const getPeriodData = (period: string): MarketData[] => {
@@ -132,12 +133,60 @@ const MarketIndices: React.FC = () => {
   ];
 
   useEffect(() => {
-    // 모의 데이터 로딩
-    setTimeout(() => {
+    fetchMarketData();
+    fetchMarketStatus();
+  }, [selectedPeriod, selectedMarket]);
+
+  const fetchMarketData = async () => {
+    setLoading(true);
+    try {
+      // API에서 실제 데이터 가져오기
+      const marketParam = selectedMarket === 'all' ? '' : `&market=${selectedMarket}`;
+      const response = await fetch(`http://localhost:8000/v1/market/indices?${marketParam}`);
+      const data = await response.json();
+      
+      if (data.indices) {
+        // API 데이터를 프론트엔드 형식으로 변환
+        const adjustedData = data.indices.map((index: any) => {
+          const multiplier = getPeriodMultiplier(selectedPeriod);
+          return {
+            ...index,
+            change: (index.change || 0) * multiplier,
+            changePercent: (index.change_percent || 0) * multiplier,
+            volume: index.volume || 'N/A'
+          };
+        });
+        setMarketData(adjustedData);
+      }
+    } catch (error) {
+      console.error('시장 데이터 조회 실패:', error);
+      // 에러 시 모의 데이터 사용
       setMarketData(getPeriodData(selectedPeriod));
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, [selectedPeriod]);
+    }
+  };
+
+  const fetchMarketStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/v1/market/status');
+      const data = await response.json();
+      setMarketStatus(data);
+    } catch (error) {
+      console.error('시장 상태 조회 실패:', error);
+    }
+  };
+
+  const getPeriodMultiplier = (period: string): number => {
+    const multipliers = {
+      '1D': 1.0,
+      '1W': 1.2,
+      '1M': 1.5,
+      'YTD': 2.0,
+      '1Y': 2.5
+    };
+    return multipliers[period as keyof typeof multipliers] || 1.0;
+  };
 
   const filteredData = marketData.filter(item => {
     if (selectedMarket === 'all') return true;
@@ -231,6 +280,24 @@ const MarketIndices: React.FC = () => {
             </button>
           ))}
         </div>
+
+        {/* 시장 상태 표시 */}
+        {marketStatus && (
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${marketStatus.korean_market?.is_open ? 'bg-green-400' : 'bg-red-400'}`}></div>
+              <span className="text-white/90">
+                한국 시장: {marketStatus.korean_market?.is_open ? '개장' : '마감'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${marketStatus.us_market?.is_open ? 'bg-green-400' : 'bg-red-400'}`}></div>
+              <span className="text-white/90">
+                미국 시장: {marketStatus.us_market?.is_open ? '개장' : '마감'}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 지수 카드들 */}

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.v1 import feed, brief, schedule, ai, companies, companies_optimized, selective_ai, popular_news, auth, company_analytics, cost_optimization, user_preferences
+from .api.v1 import feed, brief, schedule, ai, companies, companies_optimized, selective_ai, popular_news, auth, company_analytics, cost_optimization, user_preferences, market_data
 from .core.config import settings
 
 app = FastAPI(title="InsightHub API", version="0.1.0")
@@ -26,6 +26,7 @@ app.include_router(auth.router, prefix="/v1")
 app.include_router(company_analytics.router, prefix="/v1")
 app.include_router(cost_optimization.router, prefix="/v1")
 app.include_router(user_preferences.router, prefix="/v1")
+app.include_router(market_data.router, prefix="/v1")
 
 @app.get("/health")
 def health():
